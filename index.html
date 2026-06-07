@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#f5ede1">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Koffein">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="manifest" href="manifest.json">
+<title>Koffeinkollen</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f5ede1; --ink:#3b2a1f; --soft:#7a5536; --faint:#a98e74;
+    --acc:#c77d3a; --card:#fff; --line:rgba(59,42,31,.12);
+    --ok:#6f9e5e; --warn:#e0a23a; --bad:#d8693f;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{width:100%;max-width:100%;overflow-x:hidden;}
+  body{font-family:'Inter',system-ui,-apple-system,sans-serif;color:var(--ink);
+    background:var(--bg);-webkit-font-smoothing:antialiased;
+    padding:env(safe-area-inset-top) 0 calc(env(safe-area-inset-bottom) + 20px);}
+  .wrap{max-width:480px;margin:0 auto;padding:20px 20px 40px;}
+
+  .top{display:flex;justify-content:space-between;align-items:center;}
+  .top h1{font-family:'Fraunces',serif;font-size:22px;font-weight:600;}
+  .gear{width:38px;height:38px;border-radius:50%;background:rgba(59,42,31,.07);border:none;
+    display:grid;place-items:center;font-size:18px;cursor:pointer;color:var(--ink);}
+  .gear:active{transform:scale(.94);}
+
+  .lbl{font-size:12px;text-transform:uppercase;letter-spacing:1px;color:var(--soft);opacity:.8;font-weight:700;}
+  .hero{margin-top:18px;}
+  .hero .big{font-family:'Fraunces',serif;font-size:54px;font-weight:600;letter-spacing:-1.5px;line-height:1;margin-top:6px;}
+  .hero .big small{font-size:22px;font-weight:500;color:var(--soft);}
+  .hero .status{font-size:14px;color:var(--soft);margin-top:6px;font-weight:500;}
+
+  .card{background:var(--card);border-radius:24px;padding:18px 16px;margin-top:16px;
+    box-shadow:0 10px 24px -18px rgba(120,70,40,.5);}
+
+  svg.curve{width:100%;height:140px;display:block;overflow:visible;}
+  .axis{display:flex;justify-content:space-between;font-size:10px;color:var(--faint);margin-top:4px;padding:0 2px;}
+
+  /* timeline */
+  .tlwrap{margin-top:14px;padding:0 4px;}
+  .tl{position:relative;height:60px;touch-action:pan-y;}
+  .tl .track{position:absolute;left:0;right:0;top:38px;height:5px;border-radius:3px;background:rgba(59,42,31,.12);}
+  .tl .now{position:absolute;top:28px;width:2px;height:26px;background:var(--acc);opacity:.5;transform:translateX(-1px);}
+  .tl .cup{position:absolute;top:6px;transform:translateX(-50%);width:40px;height:40px;border-radius:50%;
+    background:var(--acc);color:#fff;display:grid;place-items:center;font-size:17px;cursor:grab;
+    box-shadow:0 4px 10px -3px rgba(120,70,40,.55);touch-action:none;user-select:none;border:2px solid #fff;}
+  .tl .cup.sel{outline:3px solid rgba(199,125,58,.35);}
+  .tl .cup:active{cursor:grabbing;}
+  .tl .cup .tt{position:absolute;top:-17px;left:50%;transform:translateX(-50%);font-size:10px;font-weight:700;color:var(--soft);white-space:nowrap;}
+  .tl .empty{position:absolute;inset:0;display:grid;place-items:center;font-size:13px;color:var(--faint);}
+
+  .selbar{display:flex;align-items:center;gap:10px;margin-top:10px;font-size:13px;color:var(--soft);
+    background:#fbf3e7;border-radius:14px;padding:10px 12px;}
+  .selbar b{color:var(--ink);}
+  .selbar button{margin-left:auto;background:none;border:1px solid var(--line);color:var(--bad);
+    font:inherit;font-weight:600;font-size:12px;padding:6px 12px;border-radius:20px;cursor:pointer;}
+
+  .sleep{display:flex;align-items:center;gap:13px;padding:15px 16px;border-radius:18px;margin-top:16px;background:#fff;
+    box-shadow:0 10px 24px -18px rgba(120,70,40,.5);}
+  .sleep .dot{width:14px;height:14px;border-radius:50%;flex:none;}
+  .sleep .t1{font-size:14px;font-weight:700;}
+  .sleep .t2{font-size:13px;color:var(--soft);margin-top:2px;}
+
+  .addlbl{margin-top:22px;}
+  .lib{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px;}
+  .src{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--soft);
+    background:#f0e2cf;border:none;border-radius:20px;padding:9px 13px;cursor:pointer;}
+  .src:active{transform:scale(.95);background:#e8d6bd;}
+  .src small{opacity:.7;font-weight:500;}
+
+  .foot{text-align:center;margin-top:22px;}
+  .clearbtn{background:none;border:1px solid var(--line);color:var(--soft);font:inherit;font-size:13px;
+    padding:9px 18px;border-radius:20px;cursor:pointer;}
+
+  /* settings sheet */
+  .scrim{position:fixed;inset:0;background:rgba(40,26,16,.45);opacity:0;pointer-events:none;transition:opacity .25s;z-index:40;}
+  .scrim.on{opacity:1;pointer-events:auto;}
+  .sheet{position:fixed;left:0;right:0;bottom:0;max-width:480px;margin:0 auto;background:var(--bg);
+    border-radius:26px 26px 0 0;padding:22px 20px calc(env(safe-area-inset-bottom) + 24px);
+    transform:translateY(100%);transition:transform .3s cubic-bezier(.2,.8,.2,1);z-index:41;max-height:90vh;overflow-y:auto;}
+  .sheet.on{transform:translateY(0);}
+  .sheet h2{font-family:'Fraunces',serif;font-size:22px;font-weight:600;margin-bottom:4px;}
+  .sheet .sub{font-size:13px;color:var(--soft);margin-bottom:16px;}
+  .field{margin-top:16px;}
+  .field>label{font-size:13px;font-weight:600;display:block;margin-bottom:8px;}
+  .field input[type=number]{width:100%;font:inherit;font-size:16px;padding:12px 14px;border:1px solid var(--line);
+    border-radius:14px;background:#fff;color:var(--ink);}
+  .seg{display:flex;gap:8px;flex-wrap:wrap;}
+  .seg button{flex:1;min-width:64px;font:inherit;font-size:14px;font-weight:600;padding:11px 8px;border-radius:13px;
+    border:1px solid var(--line);background:#fff;color:var(--soft);cursor:pointer;}
+  .seg button.on{background:var(--acc);color:#fff;border-color:var(--acc);}
+  .toggle{display:flex;align-items:center;justify-content:space-between;padding:13px 0;border-bottom:1px solid var(--line);}
+  .toggle:last-of-type{border-bottom:none;}
+  .toggle span{font-size:15px;font-weight:500;}
+  .sw{width:50px;height:30px;border-radius:16px;background:#dcc9b2;border:none;position:relative;cursor:pointer;flex:none;transition:background .2s;}
+  .sw.on{background:var(--acc);}
+  .sw::after{content:'';position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:left .2s;}
+  .sw.on::after{left:23px;}
+  .savebtn{width:100%;margin-top:22px;padding:15px;border-radius:16px;background:var(--ink);color:var(--bg);
+    border:none;font:inherit;font-weight:600;font-size:16px;cursor:pointer;}
+  .thalf-note{font-size:12px;color:var(--soft);margin-top:14px;text-align:center;}
+  .hidden{display:none !important;}
+  .disclaimer{font-size:11px;color:var(--faint);text-align:center;margin-top:26px;line-height:1.5;}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="top">
+      <h1>☕ Koffeinkollen</h1>
+      <button class="gear" id="gear" aria-label="Inställningar">⚙</button>
+    </div>
+
+    <div class="hero">
+      <div class="lbl">Koffein i blodet nu</div>
+      <div class="big" id="nowLevel">0,0<small> mg/L</small></div>
+      <div class="status" id="nowStatus">Lägg till din första kaffe nedan ↓</div>
+    </div>
+
+    <div class="card">
+      <svg class="curve" id="curve" viewBox="0 0 300 140" preserveAspectRatio="none"></svg>
+      <div class="axis" id="axis"></div>
+      <div class="tlwrap">
+        <div class="tl" id="tl">
+          <div class="track"></div>
+          <div class="now" id="nowMark"></div>
+          <div class="empty" id="tlEmpty">Inga intag idag</div>
+        </div>
+      </div>
+      <div class="selbar hidden" id="selbar"></div>
+    </div>
+
+    <div class="sleep" id="sleep">
+      <span class="dot" style="background:var(--faint)"></span>
+      <div><div class="t1">Sömnrisk</div><div class="t2">Lägg till intag för att se nivån vid läggdags.</div></div>
+    </div>
+
+    <div class="addlbl lbl">Lägg till intag</div>
+    <div class="lib" id="lib"></div>
+
+    <div class="foot">
+      <button class="clearbtn" id="clear">Rensa dagen</button>
+    </div>
+
+    <div class="disclaimer">
+      Uppskattning med en enkel farmakokinetisk modell (en-kompartment). Inte medicinsk rådgivning.
+    </div>
+  </div>
+
+  <!-- Inställningar -->
+  <div class="scrim" id="scrim"></div>
+  <div class="sheet" id="sheet">
+    <h2>Din profil</h2>
+    <div class="sub">Påverkar hur snabbt koffeinet bryts ner. Sparas på din enhet.</div>
+
+    <div class="field">
+      <label>Vikt (kg)</label>
+      <input type="number" id="pWeight" min="30" max="200" step="1" inputmode="numeric">
+    </div>
+
+    <div class="field">
+      <label>Kön</label>
+      <div class="seg" id="pSex">
+        <button data-v="kvinna">Kvinna</button>
+        <button data-v="man">Man</button>
+        <button data-v="annat">Annat</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Koffeinkänslighet</label>
+      <div class="seg" id="pSens">
+        <button data-v="tolerant">Tål mycket</button>
+        <button data-v="normal">Normal</button>
+        <button data-v="sensitive">Känslig</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Läggdags</label>
+      <input type="time" id="pBed" step="300" style="width:100%;font:inherit;font-size:16px;padding:12px 14px;border:1px solid var(--line);border-radius:14px;background:#fff;color:var(--ink);">
+    </div>
+
+    <div class="field" id="femaleOnly">
+      <div class="toggle"><span>P-piller</span><button class="sw" id="pOcp"></button></div>
+      <div class="toggle"><span>Gravid (sista trimestern)</span><button class="sw" id="pPreg"></button></div>
+    </div>
+
+    <div class="field">
+      <div class="toggle"><span>Röker</span><button class="sw" id="pSmoke"></button></div>
+      <div class="toggle"><span>65 år eller äldre</span><button class="sw" id="pOld"></button></div>
+      <div class="toggle"><span>Svår leversjukdom</span><button class="sw" id="pLiver"></button></div>
+    </div>
+
+    <div class="thalf-note" id="thalfNote"></div>
+    <button class="savebtn" id="save">Spara</button>
+  </div>
+
+<script>
+/* ============ KÄLLBIBLIOTEK (typiska mg) ============ */
+const SOURCES = [
+  { key:'brygg',  name:'Bryggkaffe', emoji:'☕', mg:95 },
+  { key:'espr',   name:'Espresso',   emoji:'⚡', mg:63 },
+  { key:'dubbel', name:'Dubbel esp.', emoji:'⚡', mg:126 },
+  { key:'latte',  name:'Latte',      emoji:'🥛', mg:63 },
+  { key:'te',     name:'Te',         emoji:'🍵', mg:47 },
+  { key:'energi', name:'Energidryck',emoji:'🥤', mg:80 },
+  { key:'energi5',name:'Energi 0,5l',emoji:'🥤', mg:160 },
+  { key:'cola',   name:'Cola',       emoji:'🥤', mg:32 },
+  { key:'pill',   name:'Tablett',    emoji:'💊', mg:100 },
+];
+
+/* ============ MODELL (PK, en-kompartment) ============ */
+const DEFAULT_PROFILE = { weight:70, sex:'kvinna', bed:'23:00', sens:'normal',
+  ocp:false, preg:false, smoke:false, old:false, liver:false };
+
+function tHalf(p){
+  let h = 4.5;                       // bas (frisk vuxen)
+  if(p.smoke) h *= 0.75;             // rökning: snabbare
+  if(p.ocp && p.sex==='kvinna') h *= 2.0;
+  if(p.preg && p.sex==='kvinna') h *= 2.5;
+  if(p.liver) h *= 2.5;
+  if(p.old) h *= 1.25;
+  if(p.sens==='sensitive') h *= 1.6; // känslig: längre halveringstid (jfr ~7 vs 4 h)
+  else if(p.sens==='tolerant') h *= 0.8;
+  return Math.max(1.5, Math.min(h, 24));
+}
+const Vd = p => 0.6 * (p.weight || 70);   // liter
+
+// Koncentration (mg/L) vid timme t givet intag (instant absorption).
+function concAt(t, intakes, p){
+  const k = Math.LN2 / tHalf(p), vd = Vd(p);
+  let amount = 0;
+  for(const it of intakes) if(it.time <= t) amount += it.mg * Math.exp(-k*(t-it.time));
+  return amount / vd;
+}
+
+/* ============ STATE ============ */
+const AX0 = 5, AX1 = 24;                  // tidsaxel 05:00–24:00
+const $ = id => document.getElementById(id);
+const todayKey = () => new Date().toISOString().slice(0,10);
+let profile = load('caf_profile', DEFAULT_PROFILE);
+let store = load('caf_intakes', { day:todayKey(), items:[] });
+if(store.day !== todayKey()) store = { day:todayKey(), items:[] };   // ny dag → nollställ
+let intakes = store.items;
+let selected = null;
+
+function load(k, def){ try{ return {...def, ...JSON.parse(localStorage.getItem(k))}; }catch(_){ return {...def}; } }
+function saveIntakes(){ localStorage.setItem('caf_intakes', JSON.stringify({ day:todayKey(), items:intakes })); }
+function saveProfile(){ localStorage.setItem('caf_profile', JSON.stringify(profile)); }
+
+const nowHour = () => { const d=new Date(); return d.getHours()+d.getMinutes()/60; };
+const bedHour = () => { const [h,m]=(profile.bed||'23:00').split(':').map(Number); return h + m/60; };
+const fmtHM = t => { let h=Math.floor(t), m=Math.round((t-h)*60); if(m===60){h++;m=0;} return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0'); };
+const fmt1 = v => v.toFixed(1).replace('.', ',');
+const timeToX = t => (t - AX0)/(AX1 - AX0);          // 0..1
+
+/* ============ RENDER ============ */
+function render(){
+  const k = Math.LN2 / tHalf(profile);
+  // y-skala: dynamiskt tak
+  let maxC = 0.5;
+  for(let t=AX0; t<=AX1; t+=0.25) maxC = Math.max(maxC, concAt(t, intakes, profile));
+  const yMax = Math.max(3, Math.ceil(maxC*1.15));
+  const W=300, H=140, yOf = c => H - (c/yMax)*H;
+
+  // kurva
+  let d='', fill='';
+  for(let i=0;i<=95;i++){
+    const t = AX0 + (AX1-AX0)*i/95, x = (i/95)*W, y = yOf(concAt(t,intakes,profile));
+    d += (i?'L':'M')+x.toFixed(1)+','+y.toFixed(1)+' ';
+  }
+  fill = d + `L${W},${H} L0,${H} Z`;
+  const bedX = timeToX(bedHour())*W, nowX = timeToX(nowHour())*W;
+  const thr2 = yOf(2), thr1 = yOf(1);
+  $('curve').innerHTML = `
+    <defs><linearGradient id="cg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#c77d3a" stop-opacity=".34"/><stop offset="1" stop-color="#c77d3a" stop-opacity="0"/></linearGradient></defs>
+    <line x1="0" y1="${thr2}" x2="${W}" y2="${thr2}" stroke="#d8693f" stroke-width="1" stroke-dasharray="4 4" opacity=".55"/>
+    <line x1="0" y1="${thr1}" x2="${W}" y2="${thr1}" stroke="#a98e74" stroke-width="1" stroke-dasharray="2 5" opacity=".5"/>
+    ${bedHour()>=AX0&&bedHour()<=AX1?`<line x1="${bedX}" y1="0" x2="${bedX}" y2="${H}" stroke="#3b2a1f" stroke-width="1" opacity=".35"/>`:''}
+    ${nowHour()>=AX0&&nowHour()<=AX1?`<line x1="${nowX}" y1="0" x2="${nowX}" y2="${H}" stroke="#c77d3a" stroke-width="1.5" opacity=".5"/>`:''}
+    <path d="${fill}" fill="url(#cg)"/>
+    <path d="${d}" fill="none" stroke="#c77d3a" stroke-width="2.5" stroke-linejoin="round"/>`;
+  $('axis').innerHTML = ['05','09','13','17','21','24'].map(h=>`<span>${h}</span>`).join('');
+
+  // hero (nu)
+  const cNow = concAt(nowHour(), intakes, profile);
+  $('nowLevel').innerHTML = fmt1(cNow) + '<small> mg/L</small>';
+  const totMg = intakes.reduce((s,i)=>s+i.mg,0);
+  $('nowStatus').textContent = intakes.length
+    ? `${intakes.length} intag idag · ${totMg} mg totalt · halveringstid ${tHalf(profile).toFixed(1).replace('.',',')} h`
+    : 'Lägg till din första kaffe nedan ↓';
+
+  // tidslinje
+  $('tlEmpty').style.display = intakes.length ? 'none' : 'grid';
+  $('nowMark').style.left = (timeToX(Math.min(Math.max(nowHour(),AX0),AX1))*100)+'%';
+  [...document.querySelectorAll('.tl .cup')].forEach(e=>e.remove());
+  for(const it of intakes){
+    const el=document.createElement('div');
+    el.className='cup'+(selected===it.id?' sel':'');
+    el.style.left=(timeToX(it.time)*100)+'%';
+    el.innerHTML=`${srcEmoji(it.key)}<span class="tt">${fmtHM(it.time)}</span>`;
+    el.dataset.id=it.id;
+    attachDrag(el, it);
+    $('tl').appendChild(el);
+  }
+
+  // vald-rad
+  const selItem = intakes.find(i=>i.id===selected);
+  if(selItem){
+    $('selbar').classList.remove('hidden');
+    $('selbar').innerHTML = `<span>${srcEmoji(selItem.key)} <b>${srcName(selItem.key)}</b> · ${selItem.mg} mg · ${fmtHM(selItem.time)} <span style="opacity:.7">(dra för att ändra tid)</span></span><button id="delBtn">Ta bort</button>`;
+    $('delBtn').onclick = ()=>{ intakes=intakes.filter(i=>i.id!==selItem.id); selected=null; saveIntakes(); render(); };
+  } else $('selbar').classList.add('hidden');
+
+  // sömnrisk
+  renderSleep(k);
+}
+
+function renderSleep(k){
+  const el=$('sleep');
+  if(!intakes.length){ el.querySelector('.dot').style.background='var(--faint)';
+    el.querySelector('.t1').textContent='Sömnrisk';
+    el.querySelector('.t2').textContent='Lägg till intag för att se nivån vid läggdags.'; return; }
+  const cb = concAt(bedHour(), intakes, profile);
+  let color, t1;
+  if(cb < 1){ color='var(--ok)'; t1='Låg risk för sömnstörning'; }
+  else if(cb <= 2){ color='var(--warn)'; t1='Måttlig risk – kan påverka känsliga'; }
+  else { color='var(--bad)'; t1='Hög risk att sömnen störs'; }
+  // när sjunker nivån under 1 mg/L?
+  let safeT=null;
+  for(let t=nowHour(); t<=30; t+=1/12){ if(concAt(t,intakes,profile) < 1){ safeT=t; break; } }
+  const safeTxt = safeT!=null ? ` · under 1 mg/L kl ${fmtHM(safeT%24)}` : '';
+  el.querySelector('.dot').style.background=color;
+  el.querySelector('.t1').textContent=t1;
+  el.querySelector('.t2').textContent=`${fmt1(cb)} mg/L vid läggdags (${fmtHM(bedHour())})${safeTxt}`;
+}
+
+const srcEmoji = key => (SOURCES.find(s=>s.key===key)||{emoji:'☕'}).emoji;
+const srcName  = key => (SOURCES.find(s=>s.key===key)||{name:'Kaffe'}).name;
+
+/* ============ DRAG ============ */
+function attachDrag(el, it){
+  let startX, moved, w, rect;
+  el.addEventListener('pointerdown', e=>{
+    e.preventDefault(); el.setPointerCapture(e.pointerId);
+    rect=$('tl').getBoundingClientRect(); w=rect.width; startX=e.clientX; moved=false;
+  });
+  el.addEventListener('pointermove', e=>{
+    if(startX==null) return;
+    if(Math.abs(e.clientX-startX)>3) moved=true;
+    if(!moved) return;
+    let frac=(e.clientX-rect.left)/w; frac=Math.min(1,Math.max(0,frac));
+    let t=AX0+frac*(AX1-AX0); t=Math.round(t*12)/12;     // 5-min-steg
+    it.time=t; el.style.left=(frac*100)+'%';
+    el.querySelector('.tt').textContent=fmtHM(t);
+    quickUpdate();
+  });
+  el.addEventListener('pointerup', e=>{
+    if(startX!=null){
+      if(!moved){ selected = selected===it.id ? null : it.id; }
+      else { intakes.sort((a,b)=>a.time-b.time); saveIntakes(); }
+      startX=null; render();
+    }
+  });
+}
+// lätt uppdatering under drag (utan att bygga om allt)
+function quickUpdate(){
+  const cNow=concAt(nowHour(),intakes,profile);
+  $('nowLevel').innerHTML=fmt1(cNow)+'<small> mg/L</small>';
+  drawCurveOnly(); renderSleep();
+}
+function drawCurveOnly(){
+  const W=300,H=140; let maxC=0.5;
+  for(let t=AX0;t<=AX1;t+=0.25) maxC=Math.max(maxC,concAt(t,intakes,profile));
+  const yMax=Math.max(3,Math.ceil(maxC*1.15)), yOf=c=>H-(c/yMax)*H;
+  let d='';
+  for(let i=0;i<=95;i++){ const t=AX0+(AX1-AX0)*i/95,x=(i/95)*W,y=yOf(concAt(t,intakes,profile)); d+=(i?'L':'M')+x.toFixed(1)+','+y.toFixed(1)+' '; }
+  const p=$('curve').querySelectorAll('path');
+  if(p[0]) p[0].setAttribute('d', d+`L${W},${H} L0,${H} Z`);
+  if(p[1]) p[1].setAttribute('d', d);
+}
+
+/* ============ ADD / CLEAR ============ */
+function buildLib(){
+  $('lib').innerHTML = SOURCES.map(s=>`<button class="src" data-k="${s.key}">${s.emoji} ${s.name} <small>${s.mg}mg</small></button>`).join('');
+  $('lib').querySelectorAll('.src').forEach(b=>b.onclick=()=>{
+    const s=SOURCES.find(x=>x.key===b.dataset.k);
+    let t=Math.round(nowHour()*12)/12; t=Math.min(Math.max(t,AX0),AX1);
+    const it={ id:Date.now()+Math.random().toString(36).slice(2,6), key:s.key, mg:s.mg, time:t };
+    intakes.push(it); intakes.sort((a,b)=>a.time-b.time); selected=it.id; saveIntakes(); render();
+  });
+}
+$('clear').onclick = ()=>{ if(!intakes.length||confirm('Rensa alla intag för idag?')){ intakes=[]; selected=null; saveIntakes(); render(); } };
+
+/* ============ INSTÄLLNINGAR ============ */
+function openSheet(){ syncSheet(); $('scrim').classList.add('on'); $('sheet').classList.add('on'); }
+function closeSheet(){ $('scrim').classList.remove('on'); $('sheet').classList.remove('on'); }
+$('gear').onclick=openSheet; $('scrim').onclick=closeSheet;
+
+function syncSheet(){
+  $('pWeight').value=profile.weight;
+  $('pBed').value=profile.bed;
+  $('pSex').querySelectorAll('button').forEach(b=>b.classList.toggle('on', b.dataset.v===profile.sex));
+  $('pSens').querySelectorAll('button').forEach(b=>b.classList.toggle('on', b.dataset.v===(profile.sens||'normal')));
+  setSw('pOcp',profile.ocp); setSw('pPreg',profile.preg); setSw('pSmoke',profile.smoke);
+  setSw('pOld',profile.old); setSw('pLiver',profile.liver);
+  $('femaleOnly').classList.toggle('hidden', profile.sex!=='kvinna');
+  updateThalfNote();
+}
+function setSw(id,on){ $(id).classList.toggle('on', !!on); }
+$('pSex').querySelectorAll('button').forEach(b=>b.onclick=()=>{
+  profile.sex=b.dataset.v;
+  $('pSex').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));
+  $('femaleOnly').classList.toggle('hidden', profile.sex!=='kvinna');
+  updateThalfNote();
+});
+$('pSens').querySelectorAll('button').forEach(b=>b.onclick=()=>{
+  profile.sens=b.dataset.v;
+  $('pSens').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));
+  updateThalfNote();
+});
+['pOcp','pPreg','pSmoke','pOld','pLiver'].forEach(id=>$(id).onclick=()=>{ $(id).classList.toggle('on'); readSheet(); updateThalfNote(); });
+$('pWeight').oninput=()=>{ readSheet(); updateThalfNote(); };
+$('pBed').oninput=()=>{ profile.bed=$('pBed').value||'23:00'; };
+function readSheet(){
+  profile.weight=Math.max(30,Math.min(200, +$('pWeight').value||70));
+  profile.ocp=$('pOcp').classList.contains('on'); profile.preg=$('pPreg').classList.contains('on');
+  profile.smoke=$('pSmoke').classList.contains('on'); profile.old=$('pOld').classList.contains('on');
+  profile.liver=$('pLiver').classList.contains('on');
+}
+function updateThalfNote(){ readSheet(); $('thalfNote').textContent=`Din halveringstid blir ≈ ${tHalf(profile).toFixed(1).replace('.',',')} timmar`; }
+$('save').onclick=()=>{ readSheet(); profile.bed=$('pBed').value||'23:00'; saveProfile(); closeSheet(); render(); };
+
+/* ============ START ============ */
+buildLib(); render();
+setInterval(()=>{ $('nowLevel').innerHTML=fmt1(concAt(nowHour(),intakes,profile))+'<small> mg/L</small>'; $('nowMark').style.left=(timeToX(Math.min(Math.max(nowHour(),AX0),AX1))*100)+'%'; }, 60000);
+document.addEventListener('visibilitychange',()=>{ if(!document.hidden) render(); });
+if('serviceWorker' in navigator) window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+</script>
+</body>
+</html>
