@@ -21,9 +21,10 @@ k  = ln(2) / halveringstid
 C(t) = Σ (dos / Vd) · e^(−k·(t − intagstid))   [mg/L]
 ```
 
-Halveringstid: 4,5 h som bas, justerad av profilen (rökning, p-piller, graviditet,
-leversjukdom, ålder, koffeinkänslighet). Sömntrösklar vid läggdags: <1 mg/L låg,
-1–2 mg/L måttlig, >2 mg/L hög risk.
+Halveringstid: 5 h som bas (litteraturens snitt), justerad av profilen (rökning,
+p-piller, graviditet, leversjukdom, ålder, koffeinkänslighet). Sömntrösklar vid
+läggdags: <1 mg/L låg, 1–2 mg/L måttlig, >2 mg/L hög risk. Parametrarna är
+faktagranskade mot farmakokinetisk litteratur (se referenser i appens inställningar).
 
 Allt körs lokalt i webbläsaren – inga API:er, ingen server, ingen data lämnar enheten.
 

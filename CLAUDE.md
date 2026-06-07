@@ -42,17 +42,19 @@ Vd  = 0,6 L/kg × vikt
 k   = ln(2) / halveringstid
 C(t)= Σ_i  dos_i / Vd · e^(−k·(t − t_i))   för t_i ≤ t      [mg/L]   (instant absorption)
 ```
-Halveringstid `tHalf(profile)`: bas **4,5 h**, multiplikativa faktorer:
-| Faktor | × |
-|---|---|
-| Rökning | 0,75 |
-| P-piller (kvinna) | 2,0 |
-| Sen graviditet (kvinna) | 2,5 |
-| Svår leversjukdom | 2,5 |
-| ≥65 år | 1,25 |
-| Koffeinkänslighet: känslig / tål mycket | 1,6 / 0,8 |
-Klampas till 1,5–24 h. **Validerat mot PDF:** 70 kg → Vd 42 L → 100 mg ger topp 2,38 mg/L;
-rökare 3,4 h; p-piller 9 h; känslig 7,2 h.
+Halveringstid `tHalf(profile)`: bas **5 h** (litteraturens snitt; intervall 3–7 h),
+multiplikativa faktorer (faktagranskade mot PK-litteratur):
+| Faktor | × | Resultat | Litteratur |
+|---|---|---|---|
+| Rökning | 0,70 | 3,5 h | 3–4 h (upp till ½ snabbare) |
+| P-piller (kvinna) | 2,0 | 10 h | 8–10 h |
+| Sen graviditet (kvinna) | 2,5 | 12,5 h | 10–18 h |
+| Svår leversjukdom | 2,5 | 12,5 h | cirros >12 h |
+| ≥65 år | 1,10 | 5,5 h | blandad evidens, måttlig |
+| Känslig / Tål mycket | 1,6 / 0,8 | 8 / 4 h | känsliga ~7,4 h (1 studie) |
+Klampas till 1,5–24 h. **Validerat:** 70 kg → Vd 42 L → 100 mg ger topp 2,38 mg/L (matchar PDF);
+halveringstiderna ligger inom publicerade intervall. Sömntröskel jämförd mot EEG-djupsömnströskel
+~7 µmol/L ≈ 1,4 mg/L (faller i appens "måttliga" band).
 
 Sömnrisk vid läggdags: <1 mg/L låg · 1–2 måttlig · >2 hög. Visar även när nivån går under 1 mg/L.
 

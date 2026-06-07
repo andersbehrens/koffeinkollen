@@ -32,7 +32,7 @@ ck('Inställningar öppnas', await ev(`document.getElementById('sheet').classLis
 ck('Halveringstid-text', await ev(`document.getElementById('thalfNote').textContent.includes('halveringstid')`), await ev(`document.getElementById('thalfNote').textContent`));
 // koffeinkänslighet → längre halveringstid
 await ev(`document.querySelector('#pSens button[data-v=sensitive]').click()`); await sleep(250);
-ck('Känslig → ~7,2 h', await ev(`document.getElementById('thalfNote').textContent.includes('7,2')`), await ev(`document.getElementById('thalfNote').textContent`));
+ck('Känslig → ~8,0 h', await ev(`document.getElementById('thalfNote').textContent.includes('8,0')`), await ev(`document.getElementById('thalfNote').textContent`));
 // persistens: ladda om och kontrollera att intaget finns kvar
 await ev(`document.getElementById('save').click()`); await sleep(300);
 await cdp('Page.navigate',{url:URL}); await sleep(1500);

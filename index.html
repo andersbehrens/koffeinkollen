@@ -105,6 +105,15 @@
   .savebtn{width:100%;margin-top:22px;padding:15px;border-radius:16px;background:var(--ink);color:var(--bg);
     border:none;font:inherit;font-weight:600;font-size:16px;cursor:pointer;}
   .thalf-note{font-size:12px;color:var(--soft);margin-top:14px;text-align:center;}
+  .refs{margin-top:28px;padding-top:18px;border-top:1px solid var(--line);}
+  .refs-h{font-size:12px;text-transform:uppercase;letter-spacing:1px;color:var(--soft);font-weight:700;margin-bottom:8px;}
+  .refs p{font-size:12px;color:var(--soft);line-height:1.55;}
+  .refs ul{list-style:none;margin:12px 0 0;padding:0;}
+  .refs li{margin-bottom:9px;padding-left:14px;position:relative;}
+  .refs li::before{content:'›';position:absolute;left:0;color:var(--acc);}
+  .refs a{font-size:12.5px;color:var(--acc);text-decoration:none;line-height:1.4;}
+  .refs a:active{opacity:.55;}
+  .refs-note{margin-top:14px;font-size:11px;color:var(--faint);line-height:1.5;}
   .hidden{display:none !important;}
   .disclaimer{font-size:11px;color:var(--faint);text-align:center;margin-top:26px;line-height:1.5;}
 </style>
@@ -199,6 +208,20 @@
 
     <div class="thalf-note" id="thalfNote"></div>
     <button class="savebtn" id="save">Spara</button>
+
+    <div class="refs">
+      <div class="refs-h">Vetenskaplig grund</div>
+      <p>En-kompartment farmakokinetisk modell: distributionsvolym ≈ 0,6 L/kg, halveringstid ~5 h (justeras av profilen). Parametrar, koffeinhalter och sömntrösklar är hämtade från:</p>
+      <ul>
+        <li><a href="https://www.frontiersin.org/journals/pharmacology/articles/10.3389/fphar.2021.752826/full" target="_blank" rel="noopener">Pharmacokinetics of Caffeine – systematisk analys (Frontiers in Pharmacology, 2021)</a></li>
+        <li><a href="https://www.ncbi.nlm.nih.gov/books/NBK223808/" target="_blank" rel="noopener">Pharmacology of Caffeine (NCBI Bookshelf)</a></li>
+        <li><a href="https://www.ncbi.nlm.nih.gov/books/NBK519490/" target="_blank" rel="noopener">Caffeine – StatPearls (distributionsvolym, halveringstid)</a></li>
+        <li><a href="https://www.mayoclinic.org/healthy-lifestyle/nutrition-and-healthy-eating/in-depth/caffeine/art-20049372" target="_blank" rel="noopener">Koffeinhalter i drycker (Mayo Clinic)</a></li>
+        <li><a href="https://onlinelibrary.wiley.com/doi/10.1111/jsr.14140" target="_blank" rel="noopener">Koffein & EEG-djupsömn (Baur m.fl., J Sleep Research 2024)</a></li>
+        <li><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC3805807/" target="_blank" rel="noopener">Koffein 0/3/6 h före sömn (Drake m.fl., 2013)</a></li>
+      </ul>
+      <p class="refs-note">Modellen är en förenklad uppskattning för överblick – inte ett exakt PK-verktyg och inte medicinsk rådgivning.</p>
+    </div>
   </div>
 
 <script>
@@ -211,7 +234,7 @@ const SOURCES = [
   { key:'te',     name:'Te',         emoji:'🍵', mg:47 },
   { key:'energi', name:'Energidryck',emoji:'🥤', mg:80 },
   { key:'energi5',name:'Energi 0,5l',emoji:'🥤', mg:160 },
-  { key:'cola',   name:'Cola',       emoji:'🥤', mg:32 },
+  { key:'cola',   name:'Cola',       emoji:'🥤', mg:36 },
   { key:'pill',   name:'Tablett',    emoji:'💊', mg:100 },
 ];
 
@@ -220,13 +243,14 @@ const DEFAULT_PROFILE = { weight:70, sex:'kvinna', bed:'23:00', sens:'normal',
   ocp:false, preg:false, smoke:false, old:false, liver:false };
 
 function tHalf(p){
-  let h = 4.5;                       // bas (frisk vuxen)
-  if(p.smoke) h *= 0.75;             // rökning: snabbare
-  if(p.ocp && p.sex==='kvinna') h *= 2.0;
-  if(p.preg && p.sex==='kvinna') h *= 2.5;
-  if(p.liver) h *= 2.5;
-  if(p.old) h *= 1.25;
-  if(p.sens==='sensitive') h *= 1.6; // känslig: längre halveringstid (jfr ~7 vs 4 h)
+  // Faktagranskat mot PK-litteratur (se CLAUDE.md). Bas = litteraturens snitt ~5 h.
+  let h = 5.0;                       // bas (frisk vuxen), snitt ~5 h (intervall 3–7 h)
+  if(p.smoke) h *= 0.70;             // rökning: ~30 % snabbare (upp till hälften)
+  if(p.ocp && p.sex==='kvinna') h *= 2.0;   // p-piller: ~dubbel (8–10 h)
+  if(p.preg && p.sex==='kvinna') h *= 2.5;  // sen graviditet: 10–18 h
+  if(p.liver) h *= 2.5;              // svår leversjukdom/cirros: >12 h
+  if(p.old) h *= 1.10;               // ≥65 år: blandad evidens, måttlig förlängning
+  if(p.sens==='sensitive') h *= 1.6; // känslig: längre halveringstid (jfr ~7,4 vs 4,2 h)
   else if(p.sens==='tolerant') h *= 0.8;
   return Math.max(1.5, Math.min(h, 24));
 }

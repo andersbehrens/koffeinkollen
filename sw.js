@@ -1,4 +1,4 @@
-const CACHE_NAME = 'koffein-app-v2';
+const CACHE_NAME = 'koffein-app-v3';
 const BASE = self.location.pathname.replace(/\/sw\.js$/, '');
 const ASSETS = [
   BASE + '/',
