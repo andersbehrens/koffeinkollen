@@ -53,8 +53,10 @@ multiplikativa faktorer (faktagranskade mot PK-litteratur):
 | ≥65 år | 1,10 | 5,5 h | blandad evidens, måttlig |
 | Känslig / Tål mycket | 1,6 / 0,8 | 8 / 4 h | känsliga ~7,4 h (1 studie) |
 Klampas till 1,5–24 h. **Validerat:** 70 kg → Vd 42 L → 100 mg ger topp 2,38 mg/L (matchar PDF);
-halveringstiderna ligger inom publicerade intervall. Sömntröskel jämförd mot EEG-djupsömnströskel
-~7 µmol/L ≈ 1,4 mg/L (faller i appens "måttliga" band).
+halveringstiderna ligger inom publicerade intervall. Sömntrösklar (<1 / 1–2 / >2 mg/L) är **pragmatiska, ej formellt validerade**. Bäst belagda
+effektgräns: 7,34 µmol/L ≈ 1,4 mg/L för mätbart minskad djupsömn (Baur 2024) – faller i
+appens "måttliga" band; "1 mg/L" är medvetet satt under den för marginal. Detta står även
+i appens referenssektion.
 
 Sömnrisk vid läggdags: <1 mg/L låg · 1–2 måttlig · >2 hög. Visar även när nivån går under 1 mg/L.
 
